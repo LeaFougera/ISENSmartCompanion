@@ -35,7 +35,7 @@ fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
         NavigationItem("home", "Home", Icons.Filled.Home),
         NavigationItem("events", "Events", Icons.Filled.Event),
-        NavigationItem("history", "History", Icons.Filled.History) // ✅ Historique
+        NavigationItem("history", "History", Icons.Filled.History)
     )
 
     NavigationBar {
@@ -57,11 +57,6 @@ fun NavigationGraph(navController: NavHostController, modifier: Modifier = Modif
     NavHost(navController, startDestination = "home", modifier = modifier) {
         composable("home") { AssistantScreen() }
         composable("events") { EventsScreen(navController) }
-        composable("history") { HistoryScreen() } // ✅ Historique ajouté
-        composable("eventDetail/{eventId}") { backStackEntry ->
-            val eventId = backStackEntry.arguments?.getString("eventId")
-            val event = fakeEvents.find { it.id == eventId }
-            event?.let { EventDetailScreen(navController, it) }
-        }
+        composable("history") { HistoryScreen() }
     }
 }

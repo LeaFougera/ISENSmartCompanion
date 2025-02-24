@@ -17,37 +17,36 @@ class EventDetailActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val event: Event? = intent.getParcelableExtra("event")
+        val eventTitle = intent.getStringExtra("event_title") ?: "Événement"
+        val eventDescription = intent.getStringExtra("event_description") ?: "Aucune description disponible"
+        val eventDate = intent.getStringExtra("event_date") ?: "Date inconnue"
+        val eventLocation = intent.getStringExtra("event_location") ?: "Lieu inconnu"
+        val eventCategory = intent.getStringExtra("event_category") ?: "Catégorie inconnue"
 
         setContent {
-            if (event != null) {
-                EventDetailScreen(event)
-            } else {
-                Text("Aucun événement trouvé", fontSize = 24.sp)
-            }
+            EventDetailScreen(eventTitle, eventDescription, eventDate, eventLocation, eventCategory)
         }
     }
 }
 
 @Composable
-fun EventDetailScreen(event: Event) {
+fun EventDetailScreen(title: String, description: String, date: String, location: String, category: String) {
     val context = LocalContext.current
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = event.title, fontSize = 24.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+        Text(text = title, fontSize = 24.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = event.description, fontSize = 18.sp)
+        Text(text = description, fontSize = 18.sp)
         Spacer(modifier = Modifier.height(8.dp))
-        Text(text = "📅 ${event.date}", fontSize = 16.sp, color = androidx.compose.ui.graphics.Color.Gray)
-        Text(text = "📍 ${event.location}", fontSize = 16.sp, color = androidx.compose.ui.graphics.Color.Gray)
-        Text(text = "🎭 Catégorie : ${event.category}", fontSize = 16.sp, color = androidx.compose.ui.graphics.Color.Gray)
+        Text(text = "📅 $date", fontSize = 16.sp, color = androidx.compose.ui.graphics.Color.Gray)
+        Text(text = "📍 $location", fontSize = 16.sp, color = androidx.compose.ui.graphics.Color.Gray)
+        Text(text = "🎭 Catégorie : $category", fontSize = 16.sp, color = androidx.compose.ui.graphics.Color.Gray)
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ✅ Bouton corrigé pour fermer l'Activity
         Button(onClick = { (context as? Activity)?.finish() }) {
             Text("Retour")
         }
