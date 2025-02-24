@@ -17,65 +17,75 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
-//import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import android.util.Log
 import com.google.ai.client.generativeai.GenerativeModel
-import com.google.ai.client.generativeai.type.Content
 import kotlinx.coroutines.withContext
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 
 @Composable
 fun AssistantScreen() {
     var question by remember { mutableStateOf("") }
-    var response by remember { mutableStateOf("Votre réponse apparaîtra ici...") }
+    var aiResponse by remember { mutableStateOf("Votre réponse apparaîtra ici...") }
+    var interactionHistory by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
     // Modèle Gemini AI
     val generativeModel = GenerativeModel("gemini-1.5-flash", "AIzaSyBguWA9SSbLDlRrO6e5RZo3WoZkPpEl7as")
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween // ✅ Organise l'écran en haut et bas
-    ) {
-        // 📌 Titre ISEN Smart Companion
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
+            verticalArrangement = Arrangement.Top
         ) {
-            Text(
-                text = "ISEN",
-                fontSize = 36.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFFB71C1C) // 🔴 Rouge ISEN
-            )
-            Text(
-                text = "Smart Companion",
-                fontSize = 18.sp,
-                color = Color.Gray
-            )
+            // 📌 Titre ISEN Smart Companion
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "ISEN",
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFFB71C1C) // 🔴 Rouge ISEN
+                )
+                Text(
+                    text = "Smart Companion",
+                    fontSize = 18.sp,
+                    color = Color.Gray
+                )
+            }
+
+            // 📩 Affichage de l'historique des interactions (questions et réponses)
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = 100.dp)  // Permet de faire de la place pour le champ de texte et le bouton
+            ) {
+                items(interactionHistory) { interaction ->
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    ) {
+                        Text("Vous : ${interaction.first}", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text("IA : ${interaction.second}", fontSize = 16.sp, color = Color.Gray)
+                    }
+                }
+            }
         }
-
-        // 🔲 ESPACE VIDE AU MILIEU (pour bien centrer les éléments)
-        Spacer(modifier = Modifier.weight(1f))
-
-        // 📩 Affichage de la réponse de l’IA
-        Text(
-            text = response,
-            fontSize = 18.sp,
-            color = Color.Gray,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
 
         // 📩 Champ de texte + bouton envoyer en bas
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color(0xFFF5F5F5), shape = MaterialTheme.shapes.medium)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .align(Alignment.BottomCenter),  // Positionne le champ de texte et bouton en bas
             verticalAlignment = Alignment.CenterVertically
         ) {
             // ✏️ Champ de saisie
@@ -94,9 +104,16 @@ fun AssistantScreen() {
             Button(
                 onClick = {
                     if (question.isNotEmpty()) {
+                        // Ajouter la question à l'historique
+                        val currentQuestion = question
+
                         // Envoie de la question à Gemini AI
                         coroutineScope.launch(Dispatchers.IO) {
-                            response = getAIResponse(generativeModel, question)
+                            val aiAnswer = getAIResponse(generativeModel, currentQuestion)
+                            withContext(Dispatchers.Main) {
+                                // Mise à jour de l'historique des interactions
+                                interactionHistory = interactionHistory + Pair(currentQuestion, aiAnswer)
+                            }
                         }
                         Toast.makeText(context, "Question Submitted", Toast.LENGTH_SHORT).show()
                         question = "" // 🔄 Efface la question après envoi
