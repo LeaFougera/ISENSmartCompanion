@@ -11,37 +11,77 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import android.util.Log
 
-// Modèle de données pour un événement
+@Parcelize
 data class Event(
-    val id: Int,
+    val id: String,
     val title: String,
     val description: String,
     val date: String,
-    val location: String,  // ✅ Vérifie que cette ligne est bien présente
+    val location: String,  // ✅ Vérifie que ces champs sont bien présents
     val category: String
-)
+) : Parcelable
 
 // Liste fictive d’événements
 val fakeEvents = listOf(
-    Event(1, "Soirée BDE", "Une soirée étudiante organisée par le BDE", "15 Mars 2025", "Salle des fêtes", "Fête"),
-    Event(2, "Gala ISEN", "Un événement de prestige pour les étudiants et alumni", "10 Avril 2025", "Hôtel de Ville", "Cérémonie"),
-    Event(3, "Journée de Cohésion", "Une journée pour découvrir les associations et clubs", "5 Mai 2025", "Campus ISEN", "Association")
+    Event("1", "Soirée BDE", "Une soirée étudiante organisée par le BDE", "15 Mars 2025", "Salle des fêtes", "Fête"),
+    Event("2", "Gala ISEN", "Un événement de prestige pour les étudiants et alumni", "10 Avril 2025", "Hôtel de Ville", "Cérémonie"),
+    Event("3", "Journée de Cohésion", "Une journée pour découvrir les associations et clubs", "5 Mai 2025", "Campus ISEN", "Association")
 )
 
 @Composable
-fun EventsScreen(navController: NavController) { // ✅ Accepte `navController`
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = "📅 Événements ISEN", fontSize = 24.sp)
+fun EventsScreen(navController: NavController) {
+    var eventList by remember { mutableStateOf<List<Event>?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
+    // Récupération des données via l'API
+    LaunchedEffect(Unit) {
+        RetrofitInstance.api.getEvents().enqueue(object : Callback<List<Event>> {
+            override fun onResponse(call: Call<List<Event>>, response: Response<List<Event>>) {
+                if (response.isSuccessful) {
+                    eventList = response.body()
+                    isLoading = false
+                } else {
+                    errorMessage = "Échec du chargement des événements"
+                    isLoading = false
+                }
+            }
+
+            override fun onFailure(call: Call<List<Event>>, t: Throwable) {
+                errorMessage = "Erreur : ${t.message}"
+                isLoading = false
+                Log.e("EventsScreen", "Échec de l'appel API : ${t.message}")
+            }
+        })
+    }
+
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        Text(text = "📅 Événements ISEN", fontSize = 24.sp)
         Spacer(modifier = Modifier.height(16.dp))
 
-        LazyColumn {
-            items(fakeEvents) { event ->
-                EventItem(event, navController) // ✅ Passe `navController` à EventItem
+        when {
+            isLoading -> {
+                CircularProgressIndicator()
+            }
+            errorMessage != null -> {
+                Text(text = errorMessage!!, color = androidx.compose.ui.graphics.Color.Red)
+            }
+            eventList.isNullOrEmpty() -> {
+                Text(text = "Aucun événement trouvé.", fontSize = 18.sp)
+            }
+            else -> {
+                LazyColumn {
+                    items(eventList!!) { event ->
+                        EventItem(event, navController)
+                    }
+                }
             }
         }
     }

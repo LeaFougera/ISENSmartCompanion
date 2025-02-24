@@ -59,7 +59,7 @@ fun NavigationGraph(navController: NavHostController, modifier: Modifier = Modif
         composable("events") { EventsScreen(navController) }
         composable("history") { HistoryScreen() } // ✅ Historique ajouté
         composable("eventDetail/{eventId}") { backStackEntry ->
-            val eventId = backStackEntry.arguments?.getString("eventId")?.toIntOrNull()
+            val eventId = backStackEntry.arguments?.getString("eventId")
             val event = fakeEvents.find { it.id == eventId }
             event?.let { EventDetailScreen(navController, it) }
         }
