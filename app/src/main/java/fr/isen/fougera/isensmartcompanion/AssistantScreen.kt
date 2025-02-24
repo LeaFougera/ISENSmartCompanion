@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 @Composable
 fun AssistantScreen() {
     var question by remember { mutableStateOf("") }
+    var response by remember { mutableStateOf("Votre réponse apparaîtra ici...") }
     val context = LocalContext.current
 
     Column(
@@ -28,7 +29,7 @@ fun AssistantScreen() {
             .fillMaxSize()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween // Pour aligner le contenu en haut et la barre en bas
+        verticalArrangement = Arrangement.SpaceBetween // ✅ Organise l'écran en haut et bas
     ) {
         // 📌 Titre ISEN Smart Companion
         Column(
@@ -50,6 +51,14 @@ fun AssistantScreen() {
 
         // 🔲 ESPACE VIDE AU MILIEU (pour bien centrer les éléments)
         Spacer(modifier = Modifier.weight(1f))
+
+        // 📩 Affichage de la réponse de l’IA
+        Text(
+            text = response,
+            fontSize = 18.sp,
+            color = Color.Gray,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
 
         // 📩 Champ de texte + bouton envoyer en bas
         Row(
@@ -74,8 +83,13 @@ fun AssistantScreen() {
             // 📩 Bouton envoyer
             Button(
                 onClick = {
-                    Toast.makeText(context, "Question envoyée", Toast.LENGTH_SHORT).show()
-                    question = "" // 🔄 Efface la question après envoi
+                    if (question.isNotEmpty()) {
+                        response = "Vous avez posé : \"$question\""
+                        Toast.makeText(context, "Question Submitted", Toast.LENGTH_SHORT).show()
+                        question = "" // 🔄 Efface la question après envoi
+                    } else {
+                        Toast.makeText(context, "Veuillez entrer une question", Toast.LENGTH_SHORT).show()
+                    }
                 },
                 modifier = Modifier
                     .size(48.dp)
