@@ -17,12 +17,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+//import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import android.util.Log
+import com.google.ai.client.generativeai.GenerativeModel
+import com.google.ai.client.generativeai.type.Content
+import kotlinx.coroutines.withContext
 
 @Composable
 fun AssistantScreen() {
     var question by remember { mutableStateOf("") }
     var response by remember { mutableStateOf("Votre réponse apparaîtra ici...") }
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
+    // Modèle Gemini AI
+    val generativeModel = GenerativeModel("gemini-1.5-flash", "AIzaSyBguWA9SSbLDlRrO6e5RZo3WoZkPpEl7as")
 
     Column(
         modifier = Modifier
@@ -84,7 +94,10 @@ fun AssistantScreen() {
             Button(
                 onClick = {
                     if (question.isNotEmpty()) {
-                        response = "Vous avez posé : \"$question\""
+                        // Envoie de la question à Gemini AI
+                        coroutineScope.launch(Dispatchers.IO) {
+                            response = getAIResponse(generativeModel, question)
+                        }
                         Toast.makeText(context, "Question Submitted", Toast.LENGTH_SHORT).show()
                         question = "" // 🔄 Efface la question après envoi
                     } else {
@@ -103,5 +116,16 @@ fun AssistantScreen() {
                 )
             }
         }
+    }
+}
+
+// Fonction pour interroger Gemini AI
+private suspend fun getAIResponse(generativeModel: GenerativeModel, input: String): String {
+    return try {
+        // Appel à Gemini AI pour obtenir la réponse
+        val response = generativeModel.generateContent(input)
+        response.text ?: "Aucune réponse obtenue"
+    } catch (e: Exception) {
+        "Erreur: ${e.message}"
     }
 }
