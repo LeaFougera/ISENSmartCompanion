@@ -28,12 +28,12 @@ import fr.isen.fougera.isensmartcompanion.data.InteractionViewModel
 
 @Composable
 fun AssistantScreen(viewModel: InteractionViewModel = viewModel()) {
-    var question by remember { mutableStateOf("") }
-    var aiResponse by remember { mutableStateOf("Votre réponse apparaîtra ici...") }
+    var question by remember { mutableStateOf("") } // Question entrée par l'utilisateur
+    var aiResponse by remember { mutableStateOf("") } // Réponse de l'IA
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    // Liste des interactions pour afficher la conversation
+    // Récupération de l'historique des interactions
     val interactionHistory by viewModel.allInteractions.collectAsState(initial = emptyList())
 
     // Modèle Gemini AI
@@ -65,14 +65,32 @@ fun AssistantScreen(viewModel: InteractionViewModel = viewModel()) {
                 )
             }
 
-            // Affichage de la conversation (question/réponse)
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(interactionHistory) { interaction ->
-                    Column(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+
+
+            // Affichage de la réponse actuelle (question + réponse)
+            if (aiResponse.isNotEmpty()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .background(Color(0xFFE3F2FD), CircleShape)
+                            .padding(8.dp)
+                            .weight(1f)
                     ) {
-                        Text("Vous : ${interaction.question}", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                        Text("IA : ${interaction.answer}", fontSize = 16.sp, color = Color.Gray)
+                        Text("❓ $question", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .background(Color(0xFFFFF9C4), CircleShape)
+                            .padding(8.dp)
+                            .weight(1f)
+                    ) {
+                        Text("🤖 $aiResponse", fontSize = 16.sp)
                     }
                 }
             }
@@ -103,7 +121,7 @@ fun AssistantScreen(viewModel: InteractionViewModel = viewModel()) {
             Button(
                 onClick = {
                     if (question.isNotEmpty()) {
-                        // Envoi de la question à Gemini AI
+                        // Envoyer la question à Gemini AI
                         coroutineScope.launch(Dispatchers.IO) {
                             aiResponse = getAIResponse(generativeModel, question)
 
