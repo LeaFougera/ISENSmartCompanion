@@ -1,29 +1,60 @@
 package fr.isen.fougera.isensmartcompanion
 
+import android.app.Activity
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.filled.NotificationsNone
+import androidx.compose.material.icons.filled.Tag
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.font.FontWeight
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import android.app.Activity
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 class EventDetailActivity : ComponentActivity() {
-
-    private val notificationViewModel: NotificationViewModel = NotificationViewModel()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -34,14 +65,7 @@ class EventDetailActivity : ComponentActivity() {
         val eventCategory = intent.getStringExtra("event_category") ?: "Catégorie inconnue"
 
         setContent {
-            EventDetailScreen(
-                title = eventTitle,
-                description = eventDescription,
-                date = eventDate,
-                location = eventLocation,
-                category = eventCategory,
-                notificationViewModel = notificationViewModel
-            )
+            EventDetailScreen(eventTitle, eventDescription, eventDate, eventLocation, eventCategory)
         }
     }
 }
@@ -52,11 +76,12 @@ fun EventDetailScreen(
     description: String,
     date: String,
     location: String,
-    category: String,
-    notificationViewModel: NotificationViewModel
+    category: String
 ) {
-    var isNotified by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("EventPrefs", Context.MODE_PRIVATE)
+    var isReminderSet by remember { mutableStateOf(sharedPreferences.getBoolean(title, false)) }
+    val coroutineScope = rememberCoroutineScope()
 
     Box(
         modifier = Modifier
@@ -72,7 +97,7 @@ fun EventDetailScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Titre de l'événement
+            // 🔹 Titre de l'événement
             Text(
                 text = title,
                 fontSize = 24.sp,
@@ -81,7 +106,7 @@ fun EventDetailScreen(
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            // Carte de la description de l'événement
+            // 🔹 Carte de description
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -99,33 +124,45 @@ fun EventDetailScreen(
                 }
             }
 
-            // Informations supplémentaires sur l'événement (Date, Lieu, Catégorie)
+            // 🔹 Informations de l'événement
             InfoRow(icon = Icons.Filled.Event, label = "Date", value = date)
             Spacer(modifier = Modifier.height(8.dp))
             InfoRow(icon = Icons.Filled.LocationOn, label = "Lieu", value = location)
             Spacer(modifier = Modifier.height(8.dp))
             InfoRow(icon = Icons.Filled.Tag, label = "Catégorie", value = category)
 
-            // Bouton d'abonnement à la notification
+            // 🔔 Icône de notification
             Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = {
-                    isNotified = !isNotified
-                    if (isNotified) {
-                        // Envoyer la notification après 10 secondes
-                        notificationViewModel.scheduleNotification(context)
-                    }
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB71C1C)),
-                modifier = Modifier.fillMaxWidth()
+            Row(
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                IconButton(
+                    onClick = {
+                        isReminderSet = !isReminderSet
+                        sharedPreferences.edit().putBoolean(title, isReminderSet).apply()
+
+                        if (isReminderSet) {
+                            coroutineScope.launch {
+                                delay(10_000) // ⏳ Attente de 10 secondes
+                                sendNotification(context, title, description)
+                            }
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = if (isReminderSet) Icons.Filled.NotificationsActive else Icons.Filled.NotificationsNone,
+                        contentDescription = "Activer/Désactiver le rappel",
+                        tint = if (isReminderSet) Color.Green else Color.Gray
+                    )
+                }
                 Text(
-                    text = if (isNotified) "Désabonner des notifications" else "S'abonner aux notifications",
-                    color = Color.White
+                    text = if (isReminderSet) "Rappel activé" else "Activer le rappel",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
                 )
             }
 
-            // Bouton retour
+            // 🔙 Bouton retour
             Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = { (context as? Activity)?.finish() },
@@ -167,5 +204,39 @@ fun InfoRow(icon: ImageVector, label: String, value: String) {
                 color = Color.Black
             )
         }
+    }
+}
+
+fun sendNotification(context: Context, eventTitle: String, eventDescription: String) {
+    val channelId = "event_reminders"
+    val notificationId = eventTitle.hashCode()
+
+    // 🔹 Créer un canal de notification pour Android 8.0+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val channel = NotificationChannel(
+            channelId,
+            "Rappels d'événements",
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+            description = "Notifications pour les rappels d'événements"
+        }
+
+        val notificationManager: NotificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
+    }
+
+    // 🔔 Construire la notification
+    val notification = NotificationCompat.Builder(context, channelId)
+        .setSmallIcon(R.drawable.ic_launcher_foreground)
+        .setContentTitle("Rappel : $eventTitle")
+        .setContentText(eventDescription)
+        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+        .setAutoCancel(true)
+        .build()
+
+    // 🔥 Envoyer la notification
+    with(NotificationManagerCompat.from(context)) {
+        notify(notificationId, notification)
     }
 }
