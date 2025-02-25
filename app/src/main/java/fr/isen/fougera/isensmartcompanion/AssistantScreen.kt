@@ -19,19 +19,22 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import android.util.Log
 import com.google.ai.client.generativeai.GenerativeModel
 import kotlinx.coroutines.withContext
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.lifecycle.viewmodel.compose.viewModel
+import fr.isen.fougera.isensmartcompanion.data.InteractionViewModel
 
 @Composable
-fun AssistantScreen() {
+fun AssistantScreen(viewModel: InteractionViewModel = viewModel()) {
     var question by remember { mutableStateOf("") }
     var aiResponse by remember { mutableStateOf("Votre réponse apparaîtra ici...") }
-    var interactionHistory by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+
+    // Liste des interactions pour afficher la conversation
+    val interactionHistory by viewModel.allInteractions.collectAsState(initial = emptyList())
 
     // Modèle Gemini AI
     val generativeModel = GenerativeModel("gemini-1.5-flash", "AIzaSyBguWA9SSbLDlRrO6e5RZo3WoZkPpEl7as")
@@ -44,7 +47,7 @@ fun AssistantScreen() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            // 📌 Titre ISEN Smart Companion
+            // Titre ISEN Smart Companion
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
@@ -62,33 +65,29 @@ fun AssistantScreen() {
                 )
             }
 
-            // 📩 Affichage de l'historique des interactions (questions et réponses)
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 100.dp)  // Permet de faire de la place pour le champ de texte et le bouton
-            ) {
+            // Affichage de la conversation (question/réponse)
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(interactionHistory) { interaction ->
                     Column(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
                     ) {
-                        Text("Vous : ${interaction.first}", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                        Text("IA : ${interaction.second}", fontSize = 16.sp, color = Color.Gray)
+                        Text("Vous : ${interaction.question}", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text("IA : ${interaction.answer}", fontSize = 16.sp, color = Color.Gray)
                     }
                 }
             }
         }
 
-        // 📩 Champ de texte + bouton envoyer en bas
+        // Champ de texte + bouton envoyer en bas
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color(0xFFF5F5F5), shape = MaterialTheme.shapes.medium)
                 .padding(horizontal = 16.dp, vertical = 12.dp)
-                .align(Alignment.BottomCenter),  // Positionne le champ de texte et bouton en bas
+                .align(Alignment.BottomCenter),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // ✏️ Champ de saisie
+            // Champ de saisie
             TextField(
                 value = question,
                 onValueChange = { question = it },
@@ -100,31 +99,25 @@ fun AssistantScreen() {
                     .padding(end = 8.dp)
             )
 
-            // 📩 Bouton envoyer
+            // Bouton envoyer
             Button(
                 onClick = {
                     if (question.isNotEmpty()) {
-                        // Ajouter la question à l'historique
-                        val currentQuestion = question
-
-                        // Envoie de la question à Gemini AI
+                        // Envoi de la question à Gemini AI
                         coroutineScope.launch(Dispatchers.IO) {
-                            val aiAnswer = getAIResponse(generativeModel, currentQuestion)
-                            withContext(Dispatchers.Main) {
-                                // Mise à jour de l'historique des interactions
-                                interactionHistory = interactionHistory + Pair(currentQuestion, aiAnswer)
-                            }
+                            aiResponse = getAIResponse(generativeModel, question)
+
+                            // Ajouter l'interaction dans la base de données
+                            viewModel.insertInteraction(question, aiResponse)
                         }
-                        Toast.makeText(context, "Question Submitted", Toast.LENGTH_SHORT).show()
-                        question = "" // 🔄 Efface la question après envoi
                     } else {
                         Toast.makeText(context, "Veuillez entrer une question", Toast.LENGTH_SHORT).show()
                     }
                 },
                 modifier = Modifier
                     .size(48.dp)
-                    .clip(CircleShape), // 🔘 Rond comme sur ton design
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB71C1C)) // 🔴 Rouge ISEN
+                    .clip(CircleShape),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB71C1C))
             ) {
                 Icon(
                     imageVector = Icons.Filled.Send,

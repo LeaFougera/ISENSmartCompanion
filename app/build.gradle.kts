@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     kotlin("kapt")
     id("kotlin-parcelize")
+    id ("kotlin-kapt")
 }
 
 android {
@@ -60,14 +61,18 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation("androidx.room:room-runtime:2.5.2")
-    kapt("androidx.room:room-compiler:2.5.2") // ✅ Vérifie cette ligne
-    implementation("androidx.room:room-ktx:2.5.2")
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    kapt("androidx.room:room-compiler:2.6.1") // ✅ Vérifie cette ligne
     implementation("com.squareup.retrofit2:retrofit:2.9.0") // Retrofit
     implementation("com.squareup.retrofit2:converter-gson:2.9.0") // Convertisseur Gson
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.google.ai.client.generativeai:generativeai:0.6.0") // 🔥 SDK Gemini AI
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation ("androidx.navigation:navigation-compose:2.4.0")
-
+    implementation ("androidx.room:room-runtime:2.4.3")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
+    // Coroutine support for Room (si tu utilises les coroutines)
+    //implementation ("androidx.room:room-coroutines:2.3.0")
 }
+
