@@ -66,7 +66,6 @@ fun AssistantScreen(viewModel: InteractionViewModel = viewModel()) {
             }
 
 
-
             // Affichage de la réponse actuelle (question + réponse)
             if (aiResponse.isNotEmpty()) {
                 Row(

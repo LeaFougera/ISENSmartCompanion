@@ -39,19 +39,8 @@ fun HistoryScreen(viewModel: InteractionViewModel = viewModel()) {
                         Text("❓ ${interaction.question}", fontSize = 16.sp, fontWeight = FontWeight.Bold)
                         Text("🤖 ${interaction.answer}", fontSize = 16.sp)
 
-                        // Bouton de suppression individuelle
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End
-                        ) {
-                            IconButton(onClick = {
-                                coroutineScope.launch {
-                                    viewModel.deleteInteraction(interaction)
-                                }
-                            }) {
-                                Icon(Icons.Filled.Delete, contentDescription = "Supprimer", tint = Color.Red)
-                            }
-                        }
+
+
                     }
                 }
             }
