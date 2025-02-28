@@ -18,7 +18,53 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import java.time.LocalDate
 import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 import java.util.UUID
+
+@Composable
+fun AgendaScreen(viewModel: EventViewModel = viewModel()) {
+    val today = LocalDate.now()
+    val currentMonth = remember { mutableStateOf(YearMonth.of(today.year, today.month)) }
+
+    var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
+    var showDialog by remember { mutableStateOf(false) }
+    // Liste des événements du jour
+    val eventsForSelectedDate = remember { mutableStateOf(emptyList<Event>()) }
+
+    // Formatter pour la date (aaaa-MM-jj)
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        CalendarHeader(currentMonth.value) { newMonth -> currentMonth.value = newMonth }
+
+        CalendarGrid(currentMonth.value, today) { date ->
+            selectedDate = date
+            // Conversion en "2025-03-21" par ex.
+            val dateString = date.format(formatter)
+            // Récupération des événements pour cette date
+            eventsForSelectedDate.value = viewModel.getEventsByDate(dateString)
+
+            // Affiche la boîte de dialogue
+            showDialog = true
+        }
+    }
+
+    if (showDialog && selectedDate != null) {
+        EventDialog(
+            date = selectedDate!!,
+            onDismiss = { showDialog = false },
+            // Événements déjà présents
+            events = eventsForSelectedDate.value,
+            onSave = { event ->
+                viewModel.addEvent(event)
+                // Met à jour les événements pour cette date
+                val dateString = selectedDate!!.format(formatter)
+                eventsForSelectedDate.value = viewModel.getEventsByDate(dateString)
+                showDialog = false
+            }
+        )
+    }
+}
 
 @Composable
 fun CalendarHeader(yearMonth: YearMonth, onMonthChange: (YearMonth) -> Unit) {
@@ -51,45 +97,16 @@ fun CalendarHeader(yearMonth: YearMonth, onMonthChange: (YearMonth) -> Unit) {
 }
 
 @Composable
-fun AgendaScreen(viewModel: EventViewModel = viewModel()) {
-    val today = LocalDate.now()
-    val currentMonth = remember { mutableStateOf(YearMonth.of(today.year, today.month)) }
-    var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
-    var showDialog by remember { mutableStateOf(false) }
-    val eventsForSelectedDate = remember { mutableStateOf(emptyList<Event>()) }
-
-    Column(modifier = Modifier.padding(16.dp)) {
-        CalendarHeader(currentMonth.value) { newMonth -> currentMonth.value = newMonth }
-        CalendarGrid(currentMonth.value, today) { date ->
-            selectedDate = date
-            eventsForSelectedDate.value = viewModel.getEventsByDate(date.toString())
-            showDialog = true
-        }
-    }
-
-    if (showDialog && selectedDate != null) {
-        EventDialog(
-            date = selectedDate!!,
-            events = eventsForSelectedDate.value,
-            onDismiss = { showDialog = false },
-            onSave = { event ->
-                viewModel.addEvent(event)
-                eventsForSelectedDate.value = viewModel.getEventsByDate(selectedDate!!.toString())
-                showDialog = false
-            }
-        )
-    }
-}
-
-@Composable
 fun CalendarGrid(yearMonth: YearMonth, today: LocalDate, onDateClick: (LocalDate) -> Unit) {
     val daysInMonth = yearMonth.lengthOfMonth()
     val firstDayOfMonth = LocalDate.of(yearMonth.year, yearMonth.month, 1).dayOfWeek.value % 7
     val days = List(firstDayOfMonth) { "" } + (1..daysInMonth).map { it.toString() }
 
     LazyVerticalGrid(columns = GridCells.Fixed(7), modifier = Modifier.padding(8.dp)) {
-        items(days) { day ->
-            val date = day.toIntOrNull()?.let { LocalDate.of(yearMonth.year, yearMonth.month, it) }
+        items(days) { dayString ->
+            val date = dayString.toIntOrNull()?.let {
+                LocalDate.of(yearMonth.year, yearMonth.month, it)
+            }
             val isToday = date == today
 
             Box(
@@ -101,9 +118,9 @@ fun CalendarGrid(yearMonth: YearMonth, today: LocalDate, onDateClick: (LocalDate
                     .clickable { date?.let(onDateClick) },
                 contentAlignment = Alignment.Center
             ) {
-                if (day.isNotEmpty()) {
+                if (dayString.isNotEmpty()) {
                     Text(
-                        text = day,
+                        text = dayString,
                         color = if (isToday) Color.White else Color.Black,
                         style = MaterialTheme.typography.bodyLarge
                     )
@@ -114,16 +131,29 @@ fun CalendarGrid(yearMonth: YearMonth, today: LocalDate, onDateClick: (LocalDate
 }
 
 @Composable
-fun EventDialog(date: LocalDate, events: List<Event>, onDismiss: () -> Unit, onSave: (Event) -> Unit) {
+fun EventDialog(
+    date: LocalDate,
+    events: List<Event>,
+    onDismiss: () -> Unit,
+    onSave: (Event) -> Unit
+) {
+    // État local pour les champs du nouvel événement
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var location by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("") }
 
+    // Formatter pour la date
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
     Dialog(onDismissRequest = onDismiss) {
         Card(modifier = Modifier.padding(16.dp), shape = RoundedCornerShape(8.dp)) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("Événements pour ${date.dayOfMonth}/${date.monthValue}/${date.year}", style = MaterialTheme.typography.headlineMedium)
+
+                Text(
+                    "Événements pour ${date.dayOfMonth}/${date.monthValue}/${date.year}",
+                    style = MaterialTheme.typography.headlineMedium
+                )
 
                 if (events.isNotEmpty()) {
                     events.forEach { event ->
@@ -135,16 +165,45 @@ fun EventDialog(date: LocalDate, events: List<Event>, onDismiss: () -> Unit, onS
 
                 Spacer(modifier = Modifier.height(16.dp))
                 Text("Ajouter un nouvel événement", style = MaterialTheme.typography.headlineSmall)
-                OutlinedTextField(value = title, onValueChange = { title = it }, label = { Text("Titre") })
-                OutlinedTextField(value = description, onValueChange = { description = it }, label = { Text("Description") })
-                OutlinedTextField(value = location, onValueChange = { location = it }, label = { Text("Lieu") })
-                OutlinedTextField(value = category, onValueChange = { category = it }, label = { Text("Catégorie") })
+
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { Text("Titre") }
+                )
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    label = { Text("Description") }
+                )
+                OutlinedTextField(
+                    value = location,
+                    onValueChange = { location = it },
+                    label = { Text("Lieu") }
+                )
+                OutlinedTextField(
+                    value = category,
+                    onValueChange = { category = it },
+                    label = { Text("Catégorie") }
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
                     Button(onClick = onDismiss) { Text("Annuler") }
                     Button(onClick = {
-                        onSave(Event(UUID.randomUUID().toString(), title, description, date.toString(), location, category))
+                        // On crée un nouvel événement avec la date formatée en "yyyy-MM-dd"
+                        val newEvent = Event(
+                            id = UUID.randomUUID().toString(),
+                            title = title,
+                            description = description,
+                            date = date.format(formatter), // STOCKAGE AU FORMAT ISO
+                            location = location,
+                            category = category
+                        )
+                        onSave(newEvent)
                     }) { Text("Sauvegarder") }
                 }
             }
