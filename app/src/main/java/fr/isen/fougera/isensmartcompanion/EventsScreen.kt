@@ -1,40 +1,38 @@
 package fr.isen.fougera.isensmartcompanion
 
 import android.content.Intent
-import androidx.compose.foundation.background
+import android.util.Log
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.foundation.shape.RoundedCornerShape
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
-import android.util.Log
+import androidx.navigation.NavController
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import androidx.navigation.NavController
-import androidx.compose.ui.platform.LocalContext
 
-// Modèle de données pour un événement
-@Parcelize
-data class Event(
-    val id: String,
-    val title: String,
-    val description: String,
-    val date: String,
-    val location: String,
-    val category: String
-) : Parcelable
 
 @Composable
 fun EventsScreen(navController: NavController) {
@@ -95,7 +93,7 @@ fun EventItem(event: Event, navController: NavController) {
             .padding(8.dp)
             .clickable {
                 val intent = Intent(context, EventDetailActivity::class.java).apply {
-                    putExtra("event_id", event.id)
+                    putExtra("event_id", event.id.toString())
                     putExtra("event_title", event.title)
                     putExtra("event_description", event.description)
                     putExtra("event_date", event.date)

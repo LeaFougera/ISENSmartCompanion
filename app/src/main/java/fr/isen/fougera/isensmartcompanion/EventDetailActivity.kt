@@ -133,13 +133,14 @@ fun EventDetailScreen(
 
             // 🔔 Icône de notification
             Spacer(modifier = Modifier.height(16.dp))
+            // 🔔 Icône de notification pour activer/désactiver un rappel
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(
                     onClick = {
-                        isReminderSet = !isReminderSet
-                        sharedPreferences.edit().putBoolean(title, isReminderSet).apply()
+                        isReminderSet = !isReminderSet // 🔄 Inverse l'état du rappel
+                        sharedPreferences.edit().putBoolean(title, isReminderSet).apply() // ✅ Sauvegarde l'état
 
                         if (isReminderSet) {
                             coroutineScope.launch {

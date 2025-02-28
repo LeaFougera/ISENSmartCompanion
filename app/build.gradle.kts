@@ -2,9 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    kotlin("kapt")
     id("kotlin-parcelize")
-    id ("kotlin-kapt")
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -63,7 +62,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    kapt("androidx.room:room-compiler:2.6.1") // ✅ Vérifie cette ligne
+    ksp("androidx.room:room-compiler:2.6.1") // ✅ Vérifie cette ligne
     implementation("com.squareup.retrofit2:retrofit:2.9.0") // Retrofit
     implementation("com.squareup.retrofit2:converter-gson:2.9.0") // Convertisseur Gson
     implementation("com.google.code.gson:gson:2.10.1")
@@ -71,8 +70,11 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation ("androidx.navigation:navigation-compose:2.4.0")
     implementation ("androidx.room:room-runtime:2.4.3")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1")
+    implementation("com.kizitonwose.calendar:compose:2.4.0")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+}
     // Coroutine support for Room (si tu utilises les coroutines)
     //implementation ("androidx.room:room-coroutines:2.3.0")
-}
+
 
