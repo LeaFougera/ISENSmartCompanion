@@ -73,6 +73,8 @@ dependencies {
     implementation("com.kizitonwose.calendar:compose:2.4.0")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
 }
     // Coroutine support for Room (si tu utilises les coroutines)
     //implementation ("androidx.room:room-coroutines:2.3.0")
