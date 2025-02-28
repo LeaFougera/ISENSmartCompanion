@@ -28,10 +28,8 @@ fun AgendaScreen(viewModel: EventViewModel = viewModel()) {
 
     var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
     var showDialog by remember { mutableStateOf(false) }
-    // Liste des événements du jour
     val eventsForSelectedDate = remember { mutableStateOf(emptyList<Event>()) }
 
-    // Formatter pour la date (aaaa-MM-jj)
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     Column(modifier = Modifier.padding(16.dp)) {
@@ -39,12 +37,8 @@ fun AgendaScreen(viewModel: EventViewModel = viewModel()) {
 
         CalendarGrid(currentMonth.value, today) { date ->
             selectedDate = date
-            // Conversion en "2025-03-21" par ex.
             val dateString = date.format(formatter)
-            // Récupération des événements pour cette date
             eventsForSelectedDate.value = viewModel.getEventsByDate(dateString)
-
-            // Affiche la boîte de dialogue
             showDialog = true
         }
     }
@@ -53,11 +47,9 @@ fun AgendaScreen(viewModel: EventViewModel = viewModel()) {
         EventDialog(
             date = selectedDate!!,
             onDismiss = { showDialog = false },
-            // Événements déjà présents
             events = eventsForSelectedDate.value,
             onSave = { event ->
                 viewModel.addEvent(event)
-                // Met à jour les événements pour cette date
                 val dateString = selectedDate!!.format(formatter)
                 eventsForSelectedDate.value = viewModel.getEventsByDate(dateString)
                 showDialog = false
@@ -137,13 +129,11 @@ fun EventDialog(
     onDismiss: () -> Unit,
     onSave: (Event) -> Unit
 ) {
-    // État local pour les champs du nouvel événement
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var location by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("") }
 
-    // Formatter pour la date
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     Dialog(onDismissRequest = onDismiss) {
@@ -194,12 +184,11 @@ fun EventDialog(
                 ) {
                     Button(onClick = onDismiss) { Text("Annuler") }
                     Button(onClick = {
-                        // On crée un nouvel événement avec la date formatée en "yyyy-MM-dd"
                         val newEvent = Event(
                             id = UUID.randomUUID().toString(),
                             title = title,
                             description = description,
-                            date = date.format(formatter), // STOCKAGE AU FORMAT ISO
+                            date = date.format(formatter),
                             location = location,
                             category = category
                         )
