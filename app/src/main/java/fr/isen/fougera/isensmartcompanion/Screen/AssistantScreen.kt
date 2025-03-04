@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -40,6 +41,8 @@ import com.google.ai.client.generativeai.GenerativeModel
 import fr.isen.fougera.isensmartcompanion.data.InteractionViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import androidx.compose.material.icons.filled.ArrowRight
+import androidx.compose.material.icons.filled.Send
 
 @Composable
 fun AssistantScreen(viewModel: InteractionViewModel = viewModel()) {
@@ -132,7 +135,6 @@ fun AssistantScreen(viewModel: InteractionViewModel = viewModel()) {
                         coroutineScope.launch(Dispatchers.IO) {
                             aiResponse = getAIResponse(generativeModel, question)
 
-                            // Ajouter l'interaction dans la base de données
                             viewModel.insertInteraction(question, aiResponse)
                         }
                     } else {
@@ -145,7 +147,7 @@ fun AssistantScreen(viewModel: InteractionViewModel = viewModel()) {
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB71C1C))
             ) {
                 Icon(
-                    imageVector = Icons.Filled.ArrowForward,
+                    imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = "Envoyer",
                     tint = Color.White
                 )
