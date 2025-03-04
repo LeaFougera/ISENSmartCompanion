@@ -28,7 +28,9 @@ fun HistoryScreen(viewModel: InteractionViewModel = viewModel()) {
         Spacer(modifier = Modifier.height(16.dp))
 
         // Liste des interactions
-        LazyColumn {
+        LazyColumn(
+            modifier = Modifier.weight(1f) // Permet au bouton de s'afficher en bas
+        ) {
             items(interactionHistory) { interaction ->
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(8.dp),
@@ -38,9 +40,6 @@ fun HistoryScreen(viewModel: InteractionViewModel = viewModel()) {
                         Text("📅 ${formatDate(interaction.date)}", fontSize = 14.sp, color = Color.Gray)
                         Text("❓ ${interaction.question}", fontSize = 16.sp, fontWeight = FontWeight.Bold)
                         Text("🤖 ${interaction.answer}", fontSize = 16.sp)
-
-
-
                     }
                 }
             }
