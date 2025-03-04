@@ -65,4 +65,3 @@ fun NavigationGraph(navController: NavHostController, modifier: Modifier = Modif
         composable("agenda") { AgendaScreen() }
     }
 }
-
