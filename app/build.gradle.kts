@@ -75,6 +75,7 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
+    implementation("androidx.compose.material3:material3:1.2.0")
 }
     // Coroutine support for Room (si tu utilises les coroutines)
     //implementation ("androidx.room:room-coroutines:2.3.0")

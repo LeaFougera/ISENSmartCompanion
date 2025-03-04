@@ -17,6 +17,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 
+import java.time.LocalDate
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +62,7 @@ fun NavigationGraph(navController: NavHostController, modifier: Modifier = Modif
         composable("home") { AssistantScreen() }
         composable("events") { EventsScreen(navController) }
         composable("history") { HistoryScreen() }
-        composable("agenda") { AgendaScreen() } // Ajout de la route pour l'agenda
+        composable("agenda") { AgendaScreen() }
     }
 }
 
