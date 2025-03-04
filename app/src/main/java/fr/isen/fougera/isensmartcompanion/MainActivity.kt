@@ -41,7 +41,7 @@ fun BottomNavigationBar(navController: NavHostController) {
         NavigationItem("home", "Home", Icons.Filled.Home),
         NavigationItem("events", "Events", Icons.Filled.Event),
         NavigationItem("history", "History", Icons.Filled.History),
-        NavigationItem("agenda", "Agenda", Icons.Filled.CalendarToday) // Ajout de l'élément Agenda
+        NavigationItem("agenda", "Agenda", Icons.Filled.CalendarToday)
     )
 
     NavigationBar {

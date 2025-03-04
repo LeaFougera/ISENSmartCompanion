@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.asStateFlow
 class EventViewM(application: Application) : AndroidViewModel(application) {
     private val repository = EventRepository(application)
 
-    // Utilisation de StateFlow au lieu de LiveData
     private val _events = MutableStateFlow<List<Event>>(emptyList())
     val events: StateFlow<List<Event>> = _events.asStateFlow()
 

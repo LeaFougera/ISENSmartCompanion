@@ -43,7 +43,6 @@ fun EventsScreen(navController: NavController) {
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    // Récupération des événements via l'API
     LaunchedEffect(Unit) {
         RetrofitInstance.api.getEvents().enqueue(object : Callback<List<Event>> {
             override fun onResponse(call: Call<List<Event>>, response: Response<List<Event>>) {
@@ -106,15 +105,14 @@ fun EventItem(event: Event, navController: NavController) {
                 context.startActivity(intent)
             },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = RoundedCornerShape(12.dp), // Arrondir les coins
-        //modifier = Modifier.background(Color(0xFFF1F1F1)) // Appliquer la couleur de fond via le Modifier
+        shape = RoundedCornerShape(12.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = event.title,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFFB71C1C) // 🔴 Rouge ISEN
+                color = Color(0xFFB71C1C)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(

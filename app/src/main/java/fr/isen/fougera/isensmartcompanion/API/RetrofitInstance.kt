@@ -6,8 +6,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitInstance {
     val api: ApiService by lazy {
         Retrofit.Builder()
-            .baseUrl("https://isen-smart-companion-default-rtdb.europe-west1.firebasedatabase.app/") // Base de l'URL
-            .addConverterFactory(GsonConverterFactory.create()) // Convertisseur JSON -> Kotlin
+            .baseUrl("https://isen-smart-companion-default-rtdb.europe-west1.firebasedatabase.app/")
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiService::class.java)
     }

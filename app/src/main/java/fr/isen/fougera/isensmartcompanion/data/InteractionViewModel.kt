@@ -16,22 +16,22 @@ class InteractionViewModel(application: Application) : AndroidViewModel(applicat
 
 
     init {
-        // Chargement initial des interactions à partir de la base de données
+        // Chargement des interactions à partir de la base de données
         viewModelScope.launch(Dispatchers.IO) {
             _allInteractions.value = interactionDao.getAllInteractions()
         }
     }
 
-    // Insérer une interaction et mettre à jour l'historique
+
     // Insérer une interaction et mettre à jour l'historique
     fun insertInteraction(question: String, answer: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val interaction = Interaction(
                 question = question,
                 answer = answer,
-                date = System.currentTimeMillis()  // Utilise le timestamp actuel
+                date = System.currentTimeMillis()
             )
-            interactionDao.insertInteraction(interaction)  // Insère l'interaction dans la base de données
+            interactionDao.insertInteraction(interaction)
         }
     }
 
@@ -39,7 +39,6 @@ class InteractionViewModel(application: Application) : AndroidViewModel(applicat
         viewModelScope.launch {
             interactionDao.deleteInteraction(interaction)
 
-            // Mise à jour de l'historique après la suppression
             _allInteractions.value = interactionDao.getAllInteractions()
         }
     }
@@ -48,7 +47,6 @@ class InteractionViewModel(application: Application) : AndroidViewModel(applicat
         viewModelScope.launch(Dispatchers.IO) {
             interactionDao.deleteAllInteractions()
 
-            // Mise à jour de l'historique après la suppression de tout
             _allInteractions.value = interactionDao.getAllInteractions()
         }
     }

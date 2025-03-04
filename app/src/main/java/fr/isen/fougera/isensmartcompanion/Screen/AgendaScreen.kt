@@ -24,7 +24,6 @@ import androidx.compose.runtime.collectAsState
 import fr.isen.fougera.isensmartcompanion.Event.Event
 import fr.isen.fougera.isensmartcompanion.Event.EventViewM
 
-// import androidx.compose.runtime.livedata.observeAsState
 
 @Composable
 fun AgendaScreen(viewModel: EventViewM = viewModel()) {
@@ -34,7 +33,6 @@ fun AgendaScreen(viewModel: EventViewM = viewModel()) {
     var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
     var showEventScreen by remember { mutableStateOf(false) }
 
-    // Observer les événements de la date sélectionnée
     val eventsForSelectedDate by viewModel.events.collectAsState()
 
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
@@ -45,12 +43,11 @@ fun AgendaScreen(viewModel: EventViewM = viewModel()) {
         CalendarGrid(currentMonth.value, today) { date ->
             selectedDate = date
             val dateString = date.format(formatter)
-            viewModel.loadEventsByDate(dateString) // Charger les événements
-            showEventScreen = true // Afficher l'écran des événements
+            viewModel.loadEventsByDate(dateString)
+            showEventScreen = true
         }
     }
 
-    // Afficher l'écran des événements prévus lorsqu'un jour est sélectionné
     if (showEventScreen && selectedDate != null) {
         AgendaEventScreen(
             date = selectedDate!!,
@@ -62,6 +59,7 @@ fun AgendaScreen(viewModel: EventViewM = viewModel()) {
         )
     }
 }
+
 @Composable
 fun CalendarHeader(yearMonth: YearMonth, onMonthChange: (YearMonth) -> Unit) {
     Row(

@@ -98,7 +98,6 @@ fun EventDetailScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // 🔹 Titre de l'événement
             Text(
                 text = title,
                 fontSize = 24.sp,
@@ -107,7 +106,6 @@ fun EventDetailScreen(
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            // 🔹 Carte de description
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -125,27 +123,26 @@ fun EventDetailScreen(
                 }
             }
 
-            // 🔹 Informations de l'événement
             InfoRow(icon = Icons.Filled.Event, label = "Date", value = date)
             Spacer(modifier = Modifier.height(8.dp))
             InfoRow(icon = Icons.Filled.LocationOn, label = "Lieu", value = location)
             Spacer(modifier = Modifier.height(8.dp))
             InfoRow(icon = Icons.Filled.Tag, label = "Catégorie", value = category)
 
-            // 🔔 Icône de notification
+
             Spacer(modifier = Modifier.height(16.dp))
-            // 🔔 Icône de notification pour activer/désactiver un rappel
+
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(
                     onClick = {
-                        isReminderSet = !isReminderSet // 🔄 Inverse l'état du rappel
-                        sharedPreferences.edit().putBoolean(title, isReminderSet).apply() // ✅ Sauvegarde l'état
+                        isReminderSet = !isReminderSet
+                        sharedPreferences.edit().putBoolean(title, isReminderSet).apply()
 
                         if (isReminderSet) {
                             coroutineScope.launch {
-                                delay(10_000) // ⏳ Attente de 10 secondes
+                                delay(10_000)
                                 sendNotification(context, title, description)
                             }
                         }
@@ -164,7 +161,6 @@ fun EventDetailScreen(
                 )
             }
 
-            // 🔙 Bouton retour
             Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = { (context as? Activity)?.finish() },
@@ -213,7 +209,6 @@ fun sendNotification(context: Context, eventTitle: String, eventDescription: Str
     val channelId = "event_reminders"
     val notificationId = eventTitle.hashCode()
 
-    // 🔹 Créer un canal de notification pour Android 8.0+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         val channel = NotificationChannel(
             channelId,
@@ -228,7 +223,6 @@ fun sendNotification(context: Context, eventTitle: String, eventDescription: Str
         notificationManager.createNotificationChannel(channel)
     }
 
-    // 🔔 Construire la notification
     val notification = NotificationCompat.Builder(context, channelId)
         .setSmallIcon(R.drawable.ic_launcher_foreground)
         .setContentTitle("Rappel : $eventTitle")
@@ -237,7 +231,6 @@ fun sendNotification(context: Context, eventTitle: String, eventDescription: Str
         .setAutoCancel(true)
         .build()
 
-    // 🔥 Envoyer la notification
     with(NotificationManagerCompat.from(context)) {
         notify(notificationId, notification)
     }

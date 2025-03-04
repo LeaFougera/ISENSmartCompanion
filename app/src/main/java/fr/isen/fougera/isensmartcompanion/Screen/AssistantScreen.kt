@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -37,21 +37,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.ai.client.generativeai.GenerativeModel
+import fr.isen.fougera.isensmartcompanion.data.InteractionViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import fr.isen.fougera.isensmartcompanion.data.InteractionViewModel
 
 @Composable
 fun AssistantScreen(viewModel: InteractionViewModel = viewModel()) {
-    var question by remember { mutableStateOf("") } // Question entrée par l'utilisateur
-    var aiResponse by remember { mutableStateOf("") } // Réponse de l'IA
+    var question by remember { mutableStateOf("") }
+    var aiResponse by remember { mutableStateOf("") }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    // Récupération de l'historique des interactions
     val interactionHistory by viewModel.allInteractions.collectAsState(initial = emptyList())
 
-    // Modèle Gemini AI
     val generativeModel = GenerativeModel("gemini-1.5-flash", "AIzaSyBguWA9SSbLDlRrO6e5RZo3WoZkPpEl7as")
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -62,7 +60,6 @@ fun AssistantScreen(viewModel: InteractionViewModel = viewModel()) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            // Titre ISEN Smart Companion
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
@@ -71,7 +68,7 @@ fun AssistantScreen(viewModel: InteractionViewModel = viewModel()) {
                     text = "ISEN",
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFFB71C1C) // 🔴 Rouge ISEN
+                    color = Color(0xFFB71C1C)
                 )
                 Text(
                     text = "Smart Companion",
@@ -80,8 +77,6 @@ fun AssistantScreen(viewModel: InteractionViewModel = viewModel()) {
                 )
             }
 
-
-            // Affichage de la réponse actuelle (question + réponse)
             if (aiResponse.isNotEmpty()) {
                 Row(
                     modifier = Modifier.fillMaxWidth()
@@ -110,7 +105,6 @@ fun AssistantScreen(viewModel: InteractionViewModel = viewModel()) {
             }
         }
 
-        // Champ de texte + bouton envoyer en bas
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -119,7 +113,7 @@ fun AssistantScreen(viewModel: InteractionViewModel = viewModel()) {
                 .align(Alignment.BottomCenter),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Champ de saisie
+
             TextField(
                 value = question,
                 onValueChange = { question = it },
@@ -131,7 +125,6 @@ fun AssistantScreen(viewModel: InteractionViewModel = viewModel()) {
                     .padding(end = 8.dp)
             )
 
-            // Bouton envoyer
             Button(
                 onClick = {
                     if (question.isNotEmpty()) {
@@ -152,7 +145,7 @@ fun AssistantScreen(viewModel: InteractionViewModel = viewModel()) {
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB71C1C))
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Send,
+                    imageVector = Icons.Filled.ArrowForward,
                     contentDescription = "Envoyer",
                     tint = Color.White
                 )
@@ -161,10 +154,8 @@ fun AssistantScreen(viewModel: InteractionViewModel = viewModel()) {
     }
 }
 
-// Fonction pour interroger Gemini AI
 private suspend fun getAIResponse(generativeModel: GenerativeModel, input: String): String {
     return try {
-        // Appel à Gemini AI pour obtenir la réponse
         val response = generativeModel.generateContent(input)
         response.text ?: "Aucune réponse obtenue"
     } catch (e: Exception) {

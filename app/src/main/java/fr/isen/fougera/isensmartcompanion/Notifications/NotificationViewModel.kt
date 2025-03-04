@@ -22,7 +22,6 @@ class NotificationViewModel : ViewModel() {
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val channelId = "event_reminders"
 
-        // Créer un canal de notification pour Android 8.0 (API 26) et supérieur
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId,
@@ -45,9 +44,9 @@ class NotificationViewModel : ViewModel() {
             .setAutoCancel(true)
             .build()
 
-        // Planifier la notification après 10 secondes
+
         GlobalScope.launch(Dispatchers.Main) {
-            delay(10000) // Attendre 10 secondes
+            delay(10000)
             NotificationManagerCompat.from(context).notify(0, notification)
         }
     }
