@@ -1,7 +1,6 @@
-package fr.isen.fougera.isensmartcompanion
+package fr.isen.fougera.isensmartcompanion.Notifications
 
 import android.content.Context
-import android.content.SharedPreferences
 
 object SharedPreferencesManager {
     private const val PREFERENCE_NAME = "user_preferences"

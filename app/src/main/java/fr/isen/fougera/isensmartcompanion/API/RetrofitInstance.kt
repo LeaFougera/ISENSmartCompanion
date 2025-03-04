@@ -1,4 +1,4 @@
-package fr.isen.fougera.isensmartcompanion
+package fr.isen.fougera.isensmartcompanion.API
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

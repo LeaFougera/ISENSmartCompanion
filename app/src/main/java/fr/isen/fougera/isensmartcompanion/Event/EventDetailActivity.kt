@@ -1,4 +1,4 @@
-package fr.isen.fougera.isensmartcompanion
+package fr.isen.fougera.isensmartcompanion.Event
 
 import android.app.Activity
 import android.app.NotificationChannel
@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import fr.isen.fougera.isensmartcompanion.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

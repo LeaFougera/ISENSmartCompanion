@@ -16,8 +16,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-
-import java.time.LocalDate
+import fr.isen.fougera.isensmartcompanion.Screen.AgendaScreen
+import fr.isen.fougera.isensmartcompanion.Screen.AssistantScreen
+import fr.isen.fougera.isensmartcompanion.Screen.EventsScreen
+import fr.isen.fougera.isensmartcompanion.Screen.HistoryScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,4 +1,4 @@
-package fr.isen.fougera.isensmartcompanion
+package fr.isen.fougera.isensmartcompanion.Event
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

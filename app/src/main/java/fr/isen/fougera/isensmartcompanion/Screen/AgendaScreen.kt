@@ -1,4 +1,4 @@
-package fr.isen.fougera.isensmartcompanion
+package fr.isen.fougera.isensmartcompanion.Screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,6 +21,9 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 import androidx.compose.runtime.collectAsState
+import fr.isen.fougera.isensmartcompanion.Event.Event
+import fr.isen.fougera.isensmartcompanion.Event.EventViewM
+
 // import androidx.compose.runtime.livedata.observeAsState
 
 @Composable

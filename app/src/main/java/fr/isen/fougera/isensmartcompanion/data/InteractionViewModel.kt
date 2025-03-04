@@ -14,6 +14,7 @@ class InteractionViewModel(application: Application) : AndroidViewModel(applicat
     private val _allInteractions = MutableStateFlow<List<Interaction>>(emptyList())
     val allInteractions = _allInteractions.asStateFlow()
 
+
     init {
         // Chargement initial des interactions à partir de la base de données
         viewModelScope.launch(Dispatchers.IO) {

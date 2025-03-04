@@ -1,29 +1,44 @@
-package fr.isen.fougera.isensmartcompanion
+package fr.isen.fougera.isensmartcompanion.Screen
 
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.ai.client.generativeai.GenerativeModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import com.google.ai.client.generativeai.GenerativeModel
-import kotlinx.coroutines.withContext
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.lifecycle.viewmodel.compose.viewModel
 import fr.isen.fougera.isensmartcompanion.data.InteractionViewModel
 
 @Composable
@@ -73,7 +88,7 @@ fun AssistantScreen(viewModel: InteractionViewModel = viewModel()) {
                 ) {
                     Box(
                         modifier = Modifier
-                            .background(Color(0xFFE3F2FD), CircleShape)
+                            .background(Color(0xFF0078FF), CircleShape)
                             .padding(8.dp)
                             .weight(1f)
                     ) {
@@ -85,7 +100,7 @@ fun AssistantScreen(viewModel: InteractionViewModel = viewModel()) {
                 ) {
                     Box(
                         modifier = Modifier
-                            .background(Color(0xFFFFF9C4), CircleShape)
+                            .background(Color(0xFFF1F0F0), CircleShape)
                             .padding(8.dp)
                             .weight(1f)
                     ) {

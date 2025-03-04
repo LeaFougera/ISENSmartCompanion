@@ -1,4 +1,4 @@
-package fr.isen.fougera.isensmartcompanion
+package fr.isen.fougera.isensmartcompanion.Event
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
